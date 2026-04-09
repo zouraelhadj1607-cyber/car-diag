@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>كاشف أعطال السيارات الفرنسية</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0c10;
+      --surface: #111520;
+      --card: #161c2e;
+      --border: #1e2a44;
+      --accent: #e63946;
+      --accent2: #f4a261;
+      --gold: #ffd166;
+      --text: #e8eaf0;
+      --muted: #7a8499;
+      --green: #06d6a0;
+      --orange: #f4a261;
+      --red: #e63946;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Tajawal', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Background pattern */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(230,57,70,0.15) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(244,162,97,0.08) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Grid lines */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== HEADER ===== */
+    header {
+      padding: 50px 0 30px;
+      text-align: center;
+    }
+
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(230,57,70,0.12);
+      border: 1px solid rgba(230,57,70,0.3);
+      padding: 8px 20px;
+      border-radius: 50px;
+      font-size: 13px;
+      color: var(--accent);
+      margin-bottom: 24px;
+      letter-spacing: 0.5px;
+    }
+
+    .logo-badge .dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    h1 {
+      font-size: clamp(28px, 6vw, 52px);
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+
+    h1 span.red { color: var(--accent); }
+    h1 span.gold { color: var(--gold); }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 16px;
+      font-weight: 400;
+      margin-bottom: 10px;
+    }
+
+    .brands {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .brand-tag {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* ===== SEARCH BOX ===== */
+    .search-section {
+      margin: 40px 0;
+    }
+
+    .search-wrapper {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .search-wrapper::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; left: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2), var(--gold));
+    }
+
+    .search-label {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .search-input {
+      flex: 1;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      direction: ltr;
+      text-align: center;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      outline: none;
+    }
+
+    .search-input::placeholder {
+      letter-spacing: 2px;
+      font-weight: 400;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(230,57,70,0.1);
+    }
+
+    .search-btn {
+      background: var(--accent);
+      border: none;
+      border-radius: 12px;
+      padding: 16px 32px;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    .search-btn:hover { background: #c1121f; }
+    .search-btn:active { transform: scale(0.97); }
+
+    .quick-codes {
+      margin-top: 16px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .quick-label { font-size: 12px; color: var(--muted); }
+
+    .quick-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: 'Tajawal', sans-serif;
+      transition: all 0.2s;
+      direction: ltr;
+    }
+
+    .quick-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ===== RESULT ===== */
+    #result { margin: 30px 0; }
+
+    .result-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      animation: slideIn 0.4s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-header {
+      padding: 24px 28px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+    }
+
+    .code-badge {
+      background: var(--accent);
+      color: white;
+      padding: 8px 18px;
+      border-radius: 10px;
+      font-size: 22px;
+      font-weight: 900;
+      direction: ltr;
+      white-space: nowrap;
+      letter-spacing: 2px;
+    }
+
+    .result-title-block { flex: 1; }
+
+    .result-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+
+    .result-desc {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .severity-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-top: 10px;
+    }
+
+    .severity-عالية { background: rgba(230,57,70,0.15); color: var(--red); border: 1px solid rgba(230,57,70,0.3); }
+    .severity-متوسطة { background: rgba(244,162,97,0.15); color: var(--orange); border: 1px solid rgba(244,162,97,0.3); }
+    .severity-خفيفة { background: rgba(6,214,160,0.15); color: var(--green); border: 1px solid rgba(6,214,160,0.3); }
+
+    .result-body {
+      padding: 28px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 600px) {
+      .result-body { grid-template-columns: 1fr; }
+      .search-row { flex-direction: column; }
+      .search-btn { width: 100%; }
+    }
+
+    .info-block h3 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-block h3::before {
+      content: '';
+      display: block;
+      width: 3px;
+      height: 14px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    .info-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .info-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #c0c8d8;
+    }
+
+    .info-list li::before {
+      content: '◆';
+      font-size: 7px;
+      color: var(--accent);
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+
+    .cars-section {
+      padding: 20px 28px;
+      border-top: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .cars-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .cars-list {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .car-tag {
+      background: rgba(230,57,70,0.1);
+      border: 1px solid rgba(230,57,70,0.2);
+      color: #e08080;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      direction: ltr;
+    }
+
+    /* Error */
+    .error-box {
+      background: rgba(230,57,70,0.08);
+      border: 1px solid rgba(230,57,70,0.3);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      color: var(--accent);
+      font-size: 15px;
+      animation: slideIn 0.3s ease;
+    }
+
+    /* ===== STATS ===== */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 40px 0;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--gold);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 40px 0;
+      color: var(--muted);
+      font-size: 13px;
+      border-top: 1px solid var(--border);
+      margin-top: 60px;
+    }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 30px;
+      color: var(--muted);
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 12px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-badge">
+      <span class="dot"></span>
+      تشخيص أعطال السيارات الفرنسية
+    </div>
+    <h1>
+      اكتشف عطل سيارتك<br>
+      <span class="red">فوراً</span> و <span class="gold">بالعربية</span>
+    </h1>
+    <p class="subtitle">أدخل كود العطل من جهاز الديازنوستيك وسنشرح لك كل شيء</p>
+    <div class="brands">
+      <span class="brand-tag">🔴 Peugeot</span>
+      <span class="brand-tag">🔶 Renault</span>
+      <span class="brand-tag">⚪ Citroën</span>
+    </div>
+  </header>
+
+  <!-- SEARCH -->
+  <div class="search-section">
+    <div class="search-wrapper">
+      <span class="search-label">أدخل كود العطل (مثال: P0300، P0171)</span>
+      <div class="search-row">
+        <input 
+          type="text" 
+          class="search-input" 
+          id="codeInput" 
+          placeholder="P0300"
+          maxlength="6"
+        />
+        <button class="search-btn" onclick="searchCode()">🔍 بحث</button>
+      </div>
+      <div class="quick-codes">
+        <span class="quick-label">أكواد سريعة:</span>
+        <button class="quick-btn" onclick="quickSearch('P0300')">P0300</button>
+        <button class="quick-btn" onclick="quickSearch('P0171')">P0171</button>
+        <button class="quick-btn" onclick="quickSearch('P0420')">P0420</button>
+        <button class="quick-btn" onclick="quickSearch('P0400')">P0400</button>
+        <button class="quick-btn" onclick="quickSearch('P1336')">P1336</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result"></div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-num">+22,000</div>
+      <div class="stat-label">كود عطل في القاعدة</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">3</div>
+      <div class="stat-label">ماركات فرنسية</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">100%</div>
+      <div class="stat-label">شرح بالعربية</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    كاشف أعطال السيارات الفرنسية &mdash; شرح واضح بالعربية
+  </div>
+</footer>
+
+<script>
+  const input = document.getElementById('codeInput');
+
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') searchCode();
+  });
+
+  function quickSearch(code) {
+    input.value = code;
+    searchCode();
+  }
+
+  async function searchCode() {
+    const code = input.value.trim();
+    if (!code) return;
+
+    const resultDiv = document.getElementById('result');
+    resultDiv.innerHTML = `<div class="loading"><div class="spinner"></div><br>جاري البحث...</div>`;
+
+    try {
+      const res = await fetch(`/search?code=${encodeURIComponent(code)}`);
+      const data = await res.json();
+
+      if (data.error) {
+        resultDiv.innerHTML = `<div class="error-box">⚠️ ${data.error}</div>`;
+        return;
+      }
+
+      const item = data.result || (data.results && data.results[0]);
+      if (!item) {
+        resultDiv.innerHTML = `<div class="error-box">⚠️ لم يتم العثور على نتائج</div>`;
+        return;
+      }
+
+      renderResult(item, resultDiv);
+    } catch(e) {
+      resultDiv.innerHTML = `<div class="error-box">❌ حدث خطأ في الاتصال</div>`;
+    }
+  }
+
+  function renderResult(d, container) {
+    const severityMap = { 'عالية': '🔴', 'متوسطة': '🟠', 'خفيفة': '🟢' };
+    const icon = severityMap[d['خطورة']] || '⚪';
+
+    const causes = (d['اسباب'] || []).map(c => `<li>${c}</li>`).join('');
+    const solutions = (d['حلول'] || []).map(s => `<li>${s}</li>`).join('');
+    const cars = (d['سيارات'] || []).map(c => `<span class="car-tag">${c}</span>`).join('');
+
+    container.innerHTML = `
+      <div class="result-card">
+        <div class="result-header">
+          <div class="code-badge">${d.code}</div>
+          <div class="result-title-block">
+            <div class="result-title">${d.titre}</div>
+            <div class="result-desc">${d.description}</div>
+            <span class="severity-badge severity-${d['خطورة']}">${icon} درجة الخطورة: ${d['خطورة']}</span>
+          </div>
+        </div>
+        <div class="result-body">
+          <div class="info-block">
+            <h3>الأسباب المحتملة</h3>
+            <ul class="info-list">${causes}</ul>
+          </div>
+          <div class="info-block">
+            <h3>طرق الإصلاح</h3>
+            <ul class="info-list">${solutions}</ul>
+          </div>
+        </div>
+        <div class="cars-section">
+          <div class="cars-label">🚗 السيارات الأكثر تأثراً:</div>
+          <div class="cars-list">${cars}</div>
+        </div>
+      </div>
+    `;
+  }
+</script>
+
+</body>
+</html>
